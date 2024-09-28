@@ -10,16 +10,33 @@ export const NewTask = () => {
   const [selectListId, setSelectListId] = useState();
   const [lists, setLists] = useState([]);
   const [title, setTitle] = useState("");
+  const [limit, setLimit] = useState("");
   const [detail, setDetail] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
   const [cookies] = useCookies();
   const navigate = useNavigate();
   const handleTitleChange = (e) => setTitle(e.target.value);
+  // 期限
+  const handleLimitChange = (e) => {
+    const date = new Date(e.target.value);
+    // ここで9時間プラスする
+    date.setHours(date.getHours() + 9);
+    // YYYY-MM-DDTHH:MM:SSZ 形式に変換, 9時間マイナスされる
+    const formattedLimit = date.toISOString();
+    setLimit(formattedLimit);
+  };
+  // 期限を表示できるようにするために整形する関数
+  const formatLimitForInput = (limit) => {
+    // limitが存在する場合は、YYYY-MM-DDTHH:MM形式に変換
+    return limit ? limit.slice(0, 16) : '';
+  };
   const handleDetailChange = (e) => setDetail(e.target.value);
   const handleSelectList = (id) => setSelectListId(id);
   const onCreateTask = () => {
     const data = {
       title: title,
+      // リクエストに期限を追加
+      limit: limit,
       detail: detail,
       done: false,
     };
@@ -67,6 +84,8 @@ export const NewTask = () => {
           </select><br />
           <label>タイトル</label><br />
           <input type="text" onChange={handleTitleChange} className="new-task-title" /><br />
+          <label>期限</label><br />
+          <input type="datetime-local" onChange={handleLimitChange} className="edit-task-title" value={formatLimitForInput(limit)} /><br />
           <label>詳細</label><br />
           <textarea type="text" onChange={handleDetailChange} className="new-task-detail" /><br />
           <button type="button" className="new-task-button" onClick={onCreateTask}>作成</button>

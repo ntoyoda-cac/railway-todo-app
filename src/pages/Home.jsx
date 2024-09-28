@@ -5,6 +5,7 @@ import axios from "axios";
 import { Header } from "../components/Header";
 import { url } from "../const";
 import "./home.scss";
+import dayjs from 'dayjs';
 
 
 export const Home = () => {
@@ -107,6 +108,47 @@ export const Home = () => {
   )
 }
 
+// limitをYYYY/MM/DD HH:MM形式 へ
+const formattedLimit = (limit) => {
+  if (!limit) return '';
+
+  const date = new Date(limit);
+
+  // 日付と時間をフォーマット
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1); // 月は0から始まるので+1
+  const day = String(date.getDate());
+  const hours = String(date.getHours()).padStart(2, '0');
+  const minutes = String(date.getMinutes()).padStart(2, '0');
+
+  // フォーマットした日付と時間を返す(YYYY/MM/DD HH:MM 形式)
+  return `${year}/${month}/${day} ${hours}:${minutes}`;
+};
+
+// 残り時間を計算する関数
+const remainingTime = (limit) => {
+  const limitDate = dayjs(limit);
+  const now = dayjs(); // 現在日時（日本）
+  const difftime = limitDate.diff(now); // 残り時間をミリ秒で取得
+
+  console.log(limitDate);
+
+  if (difftime <= 0) {
+    return "期限が過ぎています";
+  }
+
+  if (limit === null) {
+    return " - ";
+  }
+
+  // 残り時間を日・時間・分に変換
+  const days = limitDate.diff(now, 'day');
+  const hours = limitDate.diff(now, 'hour') % 24;
+  const minutes = limitDate.diff(now, 'minute') % 60;
+
+  return `${days}日 ${hours}時間 ${minutes}分`;
+}
+
 // 表示するタスク
 const Tasks = (props) => {
   const { tasks, selectListId, isDoneDisplay } = props;
@@ -122,8 +164,10 @@ const Tasks = (props) => {
           <li key={key} className="task-item">
             <Link to={`/lists/${selectListId}/tasks/${task.id}`} className="task-item-link">
               {task.title}<br />
-              {task.done ? "完了" : "未完了"}
+              期限：{formattedLimit(task.limit) ? formattedLimit(task.limit) : '設定されていません'}<br />
+              {task.done ? "進捗：完了" : "進捗：未完了"}
             </Link>
+            <br /><br />
           </li>
         ))}
       </ul>
@@ -138,9 +182,12 @@ const Tasks = (props) => {
       .map((task, key) => (
         <li key={key} className="task-item">
           <Link to={`/lists/${selectListId}/tasks/${task.id}`} className="task-item-link">
-            {task.title}<br />
-            {task.done ? "完了" : "未完了"}
+            タイトル：{task.title}<br />
+            期限：{formattedLimit(task.limit) ? formattedLimit(task.limit) : '期限が設定されていません'}<br />
+            残り時間：{remainingTime(task.limit)}<br/>
+            {task.done ? "進捗：完了" : "進捗：未完了"}
           </Link>
+          <br /><br />
         </li>
       ))}
     </ul>

@@ -11,16 +11,33 @@ export const EditTask = () => {
   const { listId, taskId } = useParams();
   const [cookies] = useCookies();
   const [title, setTitle] = useState("");
+  const [limit, setLimit] = useState("");
   const [detail, setDetail] = useState("");
   const [isDone, setIsDone] = useState();
   const [errorMessage, setErrorMessage] = useState("");
   const handleTitleChange = (e) => setTitle(e.target.value);
+  // 期限
+  const handleLimitChange = (e) => {
+    const date = new Date(e.target.value);
+    // ここで9時間プラスする
+    date.setHours(date.getHours() + 9);
+    // YYYY-MM-DDTHH:MM:SSZ 形式に変換, 9時間マイナスされる
+    const formattedLimit = date.toISOString();
+    setLimit(formattedLimit);
+  };
+  // 期限を表示できるようにするために整形する関数
+  const formatLimitForInput = (limit) => {
+    // limitが存在する場合は、YYYY-MM-DDTHH:MM形式に変換
+    return limit ? limit.slice(0, 16) : '';
+  };
   const handleDetailChange = (e) => setDetail(e.target.value);
   const handleIsDoneChange = (e) => setIsDone(e.target.value === "done");
   const onUpdateTask = () => {
     console.log(isDone)
     const data = {
       title: title,
+      // リクエストに期限を追加
+      limit: limit,
       detail: detail,
       done: isDone
     }
@@ -62,6 +79,8 @@ export const EditTask = () => {
     .then((res) => {
       const task = res.data
       setTitle(task.title)
+      // 期限を表示させるためにset
+      setLimit(task.limit)
       setDetail(task.detail)
       setIsDone(task.done)
     })
@@ -79,6 +98,8 @@ export const EditTask = () => {
         <form className="edit-task-form">
           <label>タイトル</label><br />
           <input type="text" onChange={handleTitleChange} className="edit-task-title" value={title} /><br />
+          <label>期限</label><br />
+          <input type="datetime-local" onChange={handleLimitChange} className="edit-task-title" value={formatLimitForInput(limit)} /><br />
           <label>詳細</label><br />
           <textarea type="text" onChange={handleDetailChange} className="edit-task-detail" value={detail} /><br />
           <div>
@@ -87,6 +108,7 @@ export const EditTask = () => {
           </div>
           <button type="button" className="delete-task-button" onClick={onDeleteTask}>削除</button>
           <button type="button" className="edit-task-button" onClick={onUpdateTask}>更新</button>
+          <button type="button" className="edit-task-button" onClick={() => window.location.href = "/"}>戻る</button>
         </form>
       </main>
     </div>
