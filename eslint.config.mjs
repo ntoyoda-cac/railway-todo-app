@@ -10,6 +10,9 @@ export default [
       react: {
           version: 'detect',  // Reactのバージョンを自動検出
       },
+      rules: {
+        'react/prop-types': 'off',
+      },
     },
   },
   {languageOptions: { globals: globals.browser }},

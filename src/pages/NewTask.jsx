@@ -5,6 +5,10 @@ import { url } from "../const";
 import { Header } from "../components/Header";
 import "./newTask.scss"
 import { useNavigate } from "react-router-dom";
+// dayjs
+import dayjs from "dayjs";
+import utc from 'dayjs/plugin/utc';
+dayjs.extend(utc); // プラグインを拡張
 
 export const NewTask = () => {
   const [selectListId, setSelectListId] = useState();
@@ -16,20 +20,24 @@ export const NewTask = () => {
   const [cookies] = useCookies();
   const navigate = useNavigate();
   const handleTitleChange = (e) => setTitle(e.target.value);
-  // 期限
+
+  // 入力された期限をYYYY-MM-DDTHH:MM:SSZ形式へ
   const handleLimitChange = (e) => {
-    const date = new Date(e.target.value);
-    // ここで9時間プラスする
-    date.setHours(date.getHours() + 9);
-    // YYYY-MM-DDTHH:MM:SSZ 形式に変換, 9時間マイナスされる
-    const formattedLimit = date.toISOString();
+    const inputdate = e.target.value; // YYYY-MM-DDTHH:MM形式
+    // UTCとして設定 + UTC→JST + YYYY-MM-DDTHH:MM:SSZ形式へformat
+    const formattedLimit = dayjs(inputdate).utcOffset(9).utc().format('YYYY-MM-DDTHH:mm:ss[Z]');
     setLimit(formattedLimit);
   };
+
   // 期限を表示できるようにするために整形する関数
   const formatLimitForInput = (limit) => {
-    // limitが存在する場合は、YYYY-MM-DDTHH:MM形式に変換
-    return limit ? limit.slice(0, 16) : '';
+
+    const utcLimit = dayjs(limit).utc(); // UTCとして設定
+    const jstLimit = utcLimit.utcOffset(9); // JSTに変換
+    const formattedLimit = jstLimit.format('YYYY-MM-DDTHH:mm'); // YYYY-MM-DDTHH:mm 形式へ
+    return formattedLimit;
   };
+  
   const handleDetailChange = (e) => setDetail(e.target.value);
   const handleSelectList = (id) => setSelectListId(id);
   const onCreateTask = () => {

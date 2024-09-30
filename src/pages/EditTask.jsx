@@ -5,6 +5,10 @@ import { useCookies } from "react-cookie";
 import { url } from "../const";
 import { useNavigate, useParams } from "react-router-dom";
 import "./editTask.scss"
+// dayjs
+import dayjs from "dayjs";
+import utc from 'dayjs/plugin/utc';
+dayjs.extend(utc); // プラグインを拡張
 
 export const EditTask = () => {
   const navigate = useNavigate();
@@ -16,20 +20,24 @@ export const EditTask = () => {
   const [isDone, setIsDone] = useState();
   const [errorMessage, setErrorMessage] = useState("");
   const handleTitleChange = (e) => setTitle(e.target.value);
-  // 期限
+
+  // 入力された期限をYYYY-MM-DDTHH:MM:SSZ形式へ
   const handleLimitChange = (e) => {
-    const date = new Date(e.target.value);
-    // ここで9時間プラスする
-    date.setHours(date.getHours() + 9);
-    // YYYY-MM-DDTHH:MM:SSZ 形式に変換, 9時間マイナスされる
-    const formattedLimit = date.toISOString();
+    const inputdate = e.target.value; // YYYY-MM-DDTHH:MM形式
+    // UTCとして設定 + UTC→JST + YYYY-MM-DDTHH:MM:SSZ形式へformat
+    const formattedLimit = dayjs(inputdate).utcOffset(9).utc().format('YYYY-MM-DDTHH:mm:ss[Z]');
     setLimit(formattedLimit);
   };
+
   // 期限を表示できるようにするために整形する関数
   const formatLimitForInput = (limit) => {
-    // limitが存在する場合は、YYYY-MM-DDTHH:MM形式に変換
-    return limit ? limit.slice(0, 16) : '';
+
+    const utcLimit = dayjs(limit).utc(); // UTCとして設定
+    const jstLimit = utcLimit.utcOffset(9); // JSTに変換
+    const formattedLimit = jstLimit.format('YYYY-MM-DDTHH:mm'); // YYYY-MM-DDTHH:mm 形式へ
+    return formattedLimit;
   };
+
   const handleDetailChange = (e) => setDetail(e.target.value);
   const handleIsDoneChange = (e) => setIsDone(e.target.value === "done");
   const onUpdateTask = () => {
@@ -79,7 +87,7 @@ export const EditTask = () => {
     .then((res) => {
       const task = res.data
       setTitle(task.title)
-      // 期限を表示させるためにset
+      // 期限(初期値)を表示させるためにset
       setLimit(task.limit)
       setDetail(task.detail)
       setIsDone(task.done)
