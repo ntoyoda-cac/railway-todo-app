@@ -78,20 +78,30 @@ export const Home = () => {
               <p><Link to={`/lists/${selectListId}/edit`}>選択中のリストを編集</Link></p>
             </div>
           </div>
-          <ul className="list-tab">
-            {lists.map((list, key) => {
-              const isActive = list.id === selectListId;
-              return (
-                <li 
-                  key={key}
-                  className={`list-tab-item ${isActive ? "active" : ""}`}
-                  onClick={() => handleSelectList(list.id)}
-                >
-                  {list.title}
-                </li>
-              )
-            })}
-          </ul>
+          {/* リスト一覧 */}
+          <div role="tabs">
+            <ul role="tablist" className="list-tab">
+              {lists.map((list, key) => {
+                const isActive = list.id === selectListId;
+                return (
+                  <li
+                    key={key}
+                    role="tab"
+                    tabIndex="0" // Tabキーで選択できるようになる
+                    className={`list-tab-item ${isActive ? "active" : ""}`}
+                    onClick={() => handleSelectList(list.id)}
+                    onKeyDown={(e) => {
+                      if (e.key === "Enter") {
+                        handleSelectList(list.id); // Enterキーを押したときリストを切り替える
+                      }
+                    } }
+                  >
+                    {list.title}
+                  </li>
+                )
+              })}
+            </ul>
+          </div>
           <div className="tasks">
             <div className="tasks-header">
               <h2>タスク一覧</h2>
