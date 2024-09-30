@@ -40,6 +40,7 @@ export const NewList = () => {
           <label>タイトル</label><br />
           <input type="text" onChange={handleTitleChange} className="new-list-title" /><br />
           <button type="button" onClick={onCreateList} className="new-list-button">作成</button>
+          <button type="button" className="back-button" onClick={() => window.location.href = "/"}>戻る</button>
         </form>
       </main>
     </div>

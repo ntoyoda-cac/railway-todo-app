@@ -93,6 +93,7 @@ export const NewTask = () => {
           <label>詳細</label><br />
           <textarea type="text" onChange={handleDetailChange} className="new-task-detail" /><br />
           <button type="button" className="new-task-button" onClick={onCreateTask}>作成</button>
+          <button type="button" className="back-button" onClick={() => window.location.href = "/"}>戻る</button>
         </form>
       </main>
     </div>

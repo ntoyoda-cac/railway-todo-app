@@ -117,7 +117,7 @@ export const EditTask = () => {
           </div>
           <button type="button" className="delete-task-button" onClick={onDeleteTask}>削除</button>
           <button type="button" className="edit-task-button" onClick={onUpdateTask}>更新</button>
-          <button type="button" className="edit-task-button" onClick={() => window.location.href = "/"}>戻る</button>
+          <button type="button" className="back-button" onClick={() => window.location.href = "/"}>戻る</button>
         </form>
       </main>
     </div>

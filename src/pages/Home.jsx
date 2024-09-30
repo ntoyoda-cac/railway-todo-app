@@ -120,7 +120,7 @@ const formattedLimit = (limit) => {
 
 // 残り時間を計算する関数
 const remainingTime = (limit) => {
-  const limitDate = dayjs(limit);
+  const limitDate = dayjs(limit); // limitをdayjsとして設定
   const now = dayjs(); // 現在日時（日本）
   const difftime = limitDate.diff(now); // 残り時間をミリ秒で取得
 
@@ -156,7 +156,7 @@ const Tasks = (props) => {
           <li key={key} className="task-item">
             <Link to={`/lists/${selectListId}/tasks/${task.id}`} className="task-item-link">
               {task.title}<br />
-              期限：{formattedLimit(task.limit) ? formattedLimit(task.limit) : '設定されていません'}<br />
+              期限：{formattedLimit(task.limit) ? formattedLimit(task.limit) : '期限が設定されていません'}<br />
               残り時間：{remainingTime(task.limit)}<br/>
               {task.done ? "進捗：完了" : "進捗：未完了"}
             </Link>

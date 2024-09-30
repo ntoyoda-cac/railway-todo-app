@@ -71,6 +71,7 @@ export const EditList = () => {
           <input type="text" className="edit-list-title" value={title} onChange={handleTitleChange} /><br />
           <button type="button" className="delete-list-button" onClick={onDeleteList}>削除</button>
           <button type="button" className="edit-list-button" onClick={onUpdateList}>更新</button>
+          <button type="button" className="back-button" onClick={() => window.location.href = "/"}>戻る</button>
         </form>
       </main>
     </div>
