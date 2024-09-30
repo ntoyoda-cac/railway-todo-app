@@ -14,37 +14,33 @@ export const NewTask = () => {
   const [selectListId, setSelectListId] = useState();
   const [lists, setLists] = useState([]);
   const [title, setTitle] = useState("");
+  // limitを定義
   const [limit, setLimit] = useState("");
+  // ↓現在日時を表示させる場合
+  //const [limit, setLimit] = useState(dayjs().format('YYYY-MM-DDTHH:mm'));
   const [detail, setDetail] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
   const [cookies] = useCookies();
   const navigate = useNavigate();
   const handleTitleChange = (e) => setTitle(e.target.value);
 
-  // 入力された期限をYYYY-MM-DDTHH:MM:SSZ形式へ
-  const handleLimitChange = (e) => {
-    const inputdate = e.target.value; // YYYY-MM-DDTHH:MM形式
-    // UTCとして設定 + UTC→JST + YYYY-MM-DDTHH:MM:SSZ形式へformat
-    const formattedLimit = dayjs(inputdate).utcOffset(9).utc().format('YYYY-MM-DDTHH:mm:ss[Z]');
-    setLimit(formattedLimit);
-  };
+  // 入力された期限をSET
+  const handleLimitChange = (e) => {setLimit(e.target.value)};
 
-  // 期限を表示できるようにするために整形する関数
-  const formatLimitForInput = (limit) => {
-
+  // API送信用にlimitをYYYY-MM-DDTHH:MM:SSZ形式へ
+  const formatLimitForAPI = (limit) => {
     const utcLimit = dayjs(limit).utc(); // UTCとして設定
-    const jstLimit = utcLimit.utcOffset(9); // JSTに変換
-    const formattedLimit = jstLimit.format('YYYY-MM-DDTHH:mm'); // YYYY-MM-DDTHH:mm 形式へ
+    const formattedLimit = utcLimit.format('YYYY-MM-DDTHH:mm:ss[Z]'); // YYYY-MM-DDTHH:MM:SSZ形式へ、-9時間される
     return formattedLimit;
   };
-  
+
   const handleDetailChange = (e) => setDetail(e.target.value);
   const handleSelectList = (id) => setSelectListId(id);
   const onCreateTask = () => {
     const data = {
       title: title,
       // リクエストに期限を追加
-      limit: limit,
+      limit: formatLimitForAPI(limit),
       detail: detail,
       done: false,
     };
@@ -93,7 +89,7 @@ export const NewTask = () => {
           <label>タイトル</label><br />
           <input type="text" onChange={handleTitleChange} className="new-task-title" /><br />
           <label>期限</label><br />
-          <input type="datetime-local" onChange={handleLimitChange} className="edit-task-title" value={formatLimitForInput(limit)} /><br />
+          <input type="datetime-local" onChange={handleLimitChange} className="edit-task-title" value={limit} /><br />
           <label>詳細</label><br />
           <textarea type="text" onChange={handleDetailChange} className="new-task-detail" /><br />
           <button type="button" className="new-task-button" onClick={onCreateTask}>作成</button>
